@@ -1,10 +1,10 @@
 function mesh = meshgen_nofile(mesh)
 % Total number of grid points in x and y direction
 nx=13; %51; 13 21 31 41
-ny=7; %51;  7 11 25 41
+ny=7; %51;  7 11 17 41
 
 % Number of grid points for the bar
-bnx=7; % 7 11 25 41 % This includes the obstacle
+bnx=7; % 7 11 17 31 % This includes the obstacle
 bny=3;
 
 % Size of the domain

@@ -4,7 +4,7 @@ read_flag = 1;
 if (read_flag)
     clear; clc;
 
-    fname = 'coarse_mesh_fsi';
+    fname = 'mesh3_i20_dt005';
     
     % Filenames
     fname_dat = [fname,'.dat'];
@@ -38,39 +38,50 @@ if (read_flag)
     conn = fread(fdat,[nelem  3],'double');
     sconn= fread(fdat,[nselem 3],'double');
     
+    xx = [mx(conn(:,[1 2 3 1])'); NaN(1,size(conn,1))];
+    yy = [my(conn(:,[1 2 3 1])'); NaN(1,size(conn,1))];
+    
+    %npause = 200;
     % Loop output timesteps and save data
-    u = zeros(2*nnode,nout); y = u;
-    p = zeros(nnode,nout);
+    v = VideoWriter([fname '.mp4']);
+    open(v)
     for ntime = 1:nout
+        
         % Save temporal data
-        u(:,ntime) = fread(fdat,2*nnode,'double');
-        p(:,ntime) = fread(fdat,  nnode,'double');
-        y(:,ntime) = fread(fdat,2*nnode,'double');
+        u = fread(fdat,2*nnode,'double');
+        p = fread(fdat,  nnode,'double');
+        y = fread(fdat,2*nnode,'double');
+        
+        %if (ntime==npause)
+        plot(xx,yy)
+        hold on
+        % Plot pressure contour
+        [CS,h]=tricontf(mx,my,conn,p);
+        set(h,'edgecolor','none');
+        [CS,h]=tricont(mx,my,conn,p,'-k');
+        clabel(CS,h,'fontsize',14)
+        % Plot velocity arrows
+        quiver(mx+y(1:2:2*nnode-1),...
+            my+y(2:2:2*nnode),u(1:2:2*nnode-1),...
+            u(2:2:2*nnode),'Color','white');
+        % Plot mesh of bar
+        triplot(sconn,mx+y(1:2:2*nnode-1),...
+            my+y(2:2:2*nnode),'Color','red');
+        axis equal
+        
+        hold off
+        ntime
+            %pause()
+        %end
+        
+        
+        frame = getframe(gcf);
+        writeVideo(v,frame)
     end
     
     % Close files
+    %close(v);
     fclose(fdat);
     fclose(ftxt);
     fclose(fmet);
 end
-
-% Plot what I want to plot
-
-np = 2;
-figure(3);
-triplot(conn,mx,my,'Color',[0.7 0.7 0.7]);
-hold on
-triplot(conn,mx+y(1:2:2*nnode-1,np),...
-    my+y(2:2:2*nnode,np),'Color','black');
-triplot(sconn,mx+y(1:2:2*nnode-1,np),...
-    my+y(2:2:2*nnode,np),'Color','red');
-quiver(mx+y(1:2:2*nnode-1,np),...
-    my+y(2:2:2*nnode,np),u(1:2:2*nnode-1,np),...
-    u(2:2:2*nnode,np),'Color','blue');
-hold off
-axis equal
-% xlim([0,mesh.Lx]); ylim([0,mesh.Ly])
-figure(4)
-trimesh(conn,mx,my,p(:,np));
-
-% Save to video
