@@ -1,13 +1,6 @@
 function [dudot,dp,dyddot,err] = ...
     main_fem_step(gradG,resG,udot_am,u_af,p,yddot_am,ydot_af,y_af,solver)
-% Input : mesh_file = file name where mesh data is stored
-%         Ff = force vector function/expression
-%         BC = cell array containing BC information
-% Output: u = solution vector
-%         f = force vector
-%         x = x coords
-%         y = y coords
-%         conn = connectivity array
+% Solves the FEM equation for the current Newton-Raphson iteration
 
 % Zero the tangent matrix and residual
 gradG(:,:) = 0.0; resG(:) = 0.0;

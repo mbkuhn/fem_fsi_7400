@@ -43,7 +43,7 @@ if (read_flag)
     
     %npause = 200;
     % Loop output timesteps and save data
-    v = VideoWriter([fname '.mp4']);
+    v = VideoWriter(fname,'MPEG-4');
     open(v)
     for ntime = 1:nout
         
@@ -56,10 +56,7 @@ if (read_flag)
         plot(xx,yy)
         hold on
         % Plot pressure contour
-        [CS,h]=tricontf(mx,my,conn,p);
-        set(h,'edgecolor','none');
-        [CS,h]=tricont(mx,my,conn,p,'-k');
-        clabel(CS,h,'fontsize',14)
+        tricontf(mx,my,conn,p);
         % Plot velocity arrows
         quiver(mx+y(1:2:2*nnode-1),...
             my+y(2:2:2*nnode),u(1:2:2*nnode-1),...
@@ -67,6 +64,10 @@ if (read_flag)
         % Plot mesh of bar
         triplot(sconn,mx+y(1:2:2*nnode-1),...
             my+y(2:2:2*nnode),'Color','red');
+        title(['t = ',num2str(ntime*5e-3),' s']);
+        axis tight manual
+        xlim([0 19.5])
+        ylim([0 12])
         axis equal
         
         hold off
@@ -80,7 +81,7 @@ if (read_flag)
     end
     
     % Close files
-    %close(v);
+    close(v);
     fclose(fdat);
     fclose(ftxt);
     fclose(fmet);

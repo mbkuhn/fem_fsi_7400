@@ -1,13 +1,7 @@
 function [gradG,resG] = tri_localtanres_NS(gauss,shp_mat,shpg_vec,...
     ul,udl,pl,ydl,c,eG)
-% Compute local stiffness matrix for linear triangle element
-% Inputs: ng = number of Gauss points
-%         ksi_G = ksi coords of Gauss points
-%         eta_G = eta coords of Gauss points
-%         W_G = weights of Gauss points
-%         shpa = functional form of shape function with index a
-%         shpb = functional form of shape function with index b
-% Output: kl = local stiffness matrix
+% Compute local tangent matrix and residual vector for
+% an element according to ALE NS equations
 
 ng = gauss.ng;
 W_G = gauss.W_G;

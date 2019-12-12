@@ -1,10 +1,6 @@
 function [gradG,resG] = tri_localtanres_LE_mesh(shpg_mat,Jc,yl,c)
-% Compute local stiffness matrix for linear triangle element
-% les = Linear ElastoStatic
-% Inputs: J_mat= Jacobian matrix
-%         shpa = functional form of shape function with index a
-%         shpb = functional form of shape function with index b
-% Output: kl = local stiffness matrix
+% Compute local tangent matrix and residual vector for
+% linear elastostatic in RBVMS framework to model mesh motion
 
 Jc = Jc^(-c.ma);
 
