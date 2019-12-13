@@ -7,7 +7,8 @@ ng = gauss.ng;
 W_G = gauss.W_G;
 
 % 3 shape functions, 2 directions of udot, 1 direction of p (scalar)
-gradG= zeros(3*3);
+% tangent matrix now depends on mesh variables as well (5 columns/node)
+gradG= zeros(3*3,3*5);
 resG= zeros(3*3,1);
 
 % Calculate things that do not depend on gauss points
@@ -42,6 +43,8 @@ for ig=1:ng
     % Calculate primed quantities
     upg = -tau_m/c.rho_f*Rm;
     ppg = -c.rho_f*nu_c*Rc;
+    % Calculate gradient of u'
+    gupg = sum(shpg_vec,2)*upg;
     
     % Loop shape functions
     for nna=1:3
@@ -117,13 +120,13 @@ for ig=1:ng
             % Loop vector indices
             for ii=1:2
                 % Incorporate diagonal terms
-                rind = 3*nna-2+ii-1; cind = 3*nnb-2+ii-1;
+                rind = 3*nna-2+ii-1; cind = 5*nnb-4+ii-1;
                 % Term 1 in dRm/dudot
                 gradG(rind,cind) = gradG(rind,cind) ...
                     + term12345;
                 for jj=1:2
-                    % Row and column indices
-                    rind = 3*nna-2+ii-1; cind = 3*nnb-2+jj-1;
+                    % Row and column indices (flow variables)
+                    rind = 3*nna-2+ii-1; cind = 5*nnb-4+jj-1;
                     
                     % Term 3 in dRm/dudot, part 2
                     gradG(rind,cind) = gradG(rind,cind) ...
@@ -134,9 +137,18 @@ for ig=1:ng
                     gradG(rind,cind) = gradG(rind,cind) ...
                         + shpgA(ii)*shpgB(jj)...
                         * W_G(ig)*nu_c*c.rho_f*c.afgdt;
+                    
+                    % Column indices (mesh variables)
+                    cind = 5*nnb-1+jj-1;
+                    
+                    % dRm/dyddot
+                    gradG(rind,cind) = gradG(rind,cind) ...
+                        + shpA*shpB*gupg(jj,ii) ...
+                        * W_G(ig)*c.rho_f*c.afgdt*(-1);
+
                 end
                 % Row and column indices
-                rind = 3*nna-2+ii-1; cind = 3*nnb;
+                rind = 3*nna-2+ii-1; cind = 5*nnb-2;
                 
                 % Term 7 in dRm/dp
                 gradG(rind,cind) = gradG(rind,cind) ...
@@ -150,7 +162,7 @@ for ig=1:ng
             
             for jj=1:2
                 % Row and column indices
-                rind = 3*nna; cind = 3*nnb-2+jj-1;
+                rind = 3*nna; cind = 5*nnb-4+jj-1;
                 
                 % Term 9 in dRc/dudot
                 gradG(rind,cind) = gradG(rind,cind) ...
@@ -164,10 +176,11 @@ for ig=1:ng
                 gradG(rind,cind) = gradG(rind,cind) ...
                     + shpgA(jj)*umgshpgB...
                     * W_G(ig)*tau_m*c.afgdt;
+                
             end
             
             % Term 12 in dRc/dp
-            gradG(3*nna,3*nnb) = gradG(3*nna,3*nnb) ...
+            gradG(3*nna,5*nnb-2) = gradG(3*nna,5*nnb-2) ...
                 + shpgA_shpgB...
                 * W_G(ig)*tau_m/c.rho_f;
         end

@@ -38,8 +38,8 @@ for nna=1:npe
     for nnb=1:npe
         B = econn(nnb);
         
-        Cindf = 5*B-4:5*B-2; cindf = 3*nnb-2:3*nnb;
-        Cindm = 5*B-1:5*B  ; cindm = 2*nnb-1:2*nnb;
+        Cindf = 5*B-4:5*B; cindf = 5*nnb-4:5*nnb;
+        Cindm = 5*B-1:5*B; cindm = 2*nnb-1:2*nnb;
         % Global tangent matrix
         gradG(Rindf,Cindf) = gradG(Rindf,Cindf) ...
             + gradGlf(rindf,cindf)*Jf;
